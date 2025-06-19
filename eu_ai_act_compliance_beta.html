@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EU AI Act Compliance Assistant - Beta</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #6a11cb 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo h1 {
+            color: #1e3c72;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .logo .ai-badge {
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .compliance-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ffc107;
+        }
+
+        .status-indicator.compliant {
+            background: #28a745;
+        }
+
+        .status-indicator.non-compliant {
+            background: #dc3545;
+        }
+
+        .main-container {
+            margin-top: 80px;
+            padding: 20px;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            gap: 20px;
+            height: calc(100vh - 120px);
+        }
+
+        .sidebar {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+
+        .chat-area {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ai-panel {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1e3c72;
+            border-bottom: 2px solid #6a11cb;
+            padding-bottom: 5px;
+        }
+
+        .user-profile {
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .ai-system-type {
+            margin-bottom: 20px;
+        }
+
+        .ai-system-type select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-top: 5px;
+            background: white;
+        }
+
+        .risk-categories {
+            margin-bottom: 20px;
+        }
+
+        .risk-item {
+            background: #f8f9fa;
+            border-left: 4px solid #6a11cb;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .risk-item:hover {
+            background: #e3f2fd;
+            transform: translateX(5px);
+        }
+
+        .risk-item.prohibited {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+
+        .risk-item.high-risk {
+            border-left-color: #ffc107;
+            background: #fffef7;
+        }
+
+        .risk-item.limited-risk {
+            border-left-color: #17a2b8;
+            background: #f0fdff;
+        }
+
+        .risk-item.minimal-risk {
+            border-left-color: #28a745;
+            background: #f8fff9;
+        }
+
+        .ai-articles {
+            margin-bottom: 20px;
+        }
+
+        .article-item {
+            background: #f8f9fa;
+            border-left: 4px solid #6a11cb;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .article-item:hover {
+            background: #e3f2fd;
+            transform: translateX(3px);
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 20px;
+            border-radius: 15px 15px 0 0;
+            text-align: center;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 75%;
+            padding: 15px;
+            border-radius: 15px;
+            position: relative;
+        }
+
+        .message.bot .message-content {
+            background: white;
+            border: 1px solid #e1e8ed;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: white;
+        }
+
+        .message-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            margin: 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .message.bot .message-avatar {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+        }
+
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: white;
+        }
+
+        .chat-input {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e1e8ed;
+            border-radius: 0 0 15px 15px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .chat-input input:focus {
+            border-color: #6a11cb;
+        }
+
+        .send-btn {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .ai-risk-assessment {
+            margin-bottom: 20px;
+        }
+
+        .risk-gauge {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, 
+                #28a745 0% 25%, 
+                #17a2b8 25% 50%, 
+                #ffc107 50% 75%, 
+                #dc3545 75% 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            position: relative;
+        }
+
+        .risk-gauge::before {
+            content: '';
+            width: 90px;
+            height: 90px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .risk-gauge-text {
+            position: relative;
+            z-index: 1;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #1e3c72;
+            text-align: center;
+        }
+
+        .compliance-checklist {
+            margin-bottom: 20px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .checklist-item.completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .checklist-item.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .checklist-item.missing {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .checklist-icon {
+            margin-right: 8px;
+            font-weight: bold;
+        }
+
+        .ai-models {
+            margin-bottom: 20px;
+        }
+
+        .model-item {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+
+        .model-item:hover {
+            background: #e9ecef;
+            border-color: #6a11cb;
+        }
+
+        .model-type {
+            font-weight: bold;
+            color: #1e3c72;
+            margin-bottom: 5px;
+        }
+
+        .model-status {
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            color: white;
+        }
+
+        .model-status.gpai {
+            background: #6a11cb;
+        }
+
+        .model-status.high-risk {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .model-status.standard {
+            background: #28a745;
+        }
+
+        .compliance-card {
+            background: linear-gradient(135deg, #e3f2fd, #f0f8ff);
+            border-left: 4px solid #6a11cb;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .ai-requirements {
+            background: #fff8e1;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 10px;
+            font-style: italic;
+            color: #666;
+            text-align: center;
+        }
+
+        .implementation-timeline {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .timeline-date {
+            background: #6a11cb;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 15px;
+            margin-right: 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .timeline-date.active {
+            background: #28a745;
+        }
+
+        .timeline-date.upcoming {
+            background: #ffc107;
+            color: #333;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>EU AI Act Compliance</h1>
+                <span class="ai-badge">BETA v2.0</span>
+            </div>
+            <div class="compliance-status">
+                <span class="status-indicator" id="statusIndicator"></span>
+                <span id="statusText">Assessing Compliance...</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="dashboard">
+            <div class="sidebar">
+                <div class="section-title">AI System Profile</div>
+                <div class="user-profile">
+                    <h4>Financial Institution AI Assessment</h4>
+                    <div class="ai-system-type">
+                        <label>AI System Type:</label>
+                        <select id="aiSystemType">
+                            <option value="credit-scoring">Credit Scoring System</option>
+                            <option value="fraud-detection">Fraud Detection</option>
+                            <option value="risk-assessment">Risk Assessment</option>
+                            <option value="insurance-pricing">Insurance Pricing</option>
+                            <option value="customer-service">Customer Service AI</option>
+                            <option value="trading-algorithms">Trading Algorithms</option>
+                            <option value="compliance-monitoring">Compliance Monitoring</option>
+                            <option value="chatbot">Customer Chatbot</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="section-title">Risk Categories</div>
+                <div class="risk-categories">
+                    <div class="risk-item prohibited" onclick="selectRiskCategory('prohibited')">
+                        <strong>Prohibited AI</strong><br>
+                        <small>Unacceptable risk systems</small>
+                    </div>
+                    <div class="risk-item high-risk" onclick="selectRiskCategory('high-risk')">
+                        <strong>High-Risk AI</strong><br>
+                        <small>Strict compliance requirements</small>
+                    </div>
+                    <div class="risk-item limited-risk" onclick="selectRiskCategory('limited-risk')">
+                        <strong>Limited Risk</strong><br>
+                        <small>Transparency obligations</small>
+                    </div>
+                    <div class="risk-item minimal-risk" onclick="selectRiskCategory('minimal-risk')">
+                        <strong>Minimal Risk</strong><br>
+                        <small>Basic requirements only</small>
+                    </div>
+                </div>
+
+                <div class="section-title">AI Act Articles</div>
+                <div class="ai-articles">
+                    <div class="article-item" onclick="selectArticle('article6')">
+                        <strong>Article 6</strong><br>High-Risk Classification
+                    </div>
+                    <div class="article-item" onclick="selectArticle('article9')">
+                        <strong>Article 9</strong><br>Risk Management System
+                    </div>
+                    <div class="article-item" onclick="selectArticle('article10')">
+                        <strong>Article 10</strong><br>Data Governance
+                    </div>
+                    <div class="article-item" onclick="selectArticle('article13')">
+                        <strong>Article 13</strong><br>Transparency & Information
+                    </div>
+                    <div class="article-item" onclick="selectArticle('article14')">
+                        <strong>Article 14</strong><br>Human Oversight
+                    </div>
+                    <div class="article-item" onclick="selectArticle('article15')">
+                        <strong>Article 15</strong><br>Accuracy & Robustness
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-area">
+                <div class="chat-header">
+                    <h2>EU AI Act Compliance Assistant</h2>
+                    <p>Navigate AI regulations with expert guidance for financial institutions</p>
+                </div>
+
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message bot">
+                        <div class="message-avatar">🤖</div>
+                        <div class="message-content">
+                            <strong>Welcome to the EU AI Act Compliance Assistant!</strong><br><br>
+                            The EU AI Act is now in force and will be fully applicable from August 2026. I'm here to help financial institutions navigate these new requirements.
+                            
+                            <div class="compliance-card">
+                                <strong>🎯 Current Status:</strong><br>
+                                • Prohibited AI practices: Enforced from Feb 2025<br>
+                                • GPAI model obligations: From Aug 2025<br>
+                                • High-risk system requirements: From Aug 2026<br>
+                                • Maximum penalties: €35M or 7% global turnover
+                            </div>
+                            
+                            I can help you with:
+                            <ul style="margin: 10px 0; padding-left: 20px;">
+                                <li>AI system risk classification</li>
+                                <li>High-risk AI compliance requirements</li>
+                                <li>Technical documentation and governance</li>
+                                <li>GPAI model obligations</li>
+                                <li>Cloud configuration for AI Act compliance</li>
+                            </ul>
+                            
+                            What AI system would you like to assess today?
+                        </div>
+                    </div>
+                </div>
+
+                <div class="typing-indicator" id="typingIndicator">
+                    Assistant is analyzing AI Act requirements...
+                </div>
+
+                <div class="chat-input">
+                    <div class="input-group">
+                        <input type="text" id="messageInput" placeholder="Ask about AI Act compliance, risk classification, or specific requirements..." />
+                        <button class="send-btn" onclick="sendMessage()">Send</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ai-panel">
+                <div class="section-title">Risk Assessment</div>
+                <div class="ai-risk-assessment">
+                    <div class="risk-gauge">
+                        <div class="risk-gauge-text" id="riskLevel">
+                            HIGH<br>RISK
+                        </div>
+                    </div>
+                    <p style="text-align: center; font-size: 0.9rem;">
+                        <strong>Credit Scoring System</strong><br>
+                        Requires full AI Act compliance
+                    </p>
+                </div>
+
+                <div class="section-title">Implementation Timeline</div>
+                <div class="implementation-timeline">
+                    <div class="timeline-item">
+                        <span class="timeline-date active">Feb 2025</span>
+                        <span>Prohibited AI Ban</span>
+                    </div>
+                    <div class="timeline-item">
+                        <span class="timeline-date upcoming">Aug 2025</span>
+                        <span>GPAI Requirements</span>
+                    </div>
+                    <div class="timeline-item">
+                        <span class="timeline-date upcoming">Aug 2026</span>
+                        <span>High-Risk Systems</span>
+                    </div>
+                    <div class="timeline-item">
+                        <span class="timeline-date upcoming">Aug 2027</span>
+                        <span>Embedded Systems</span>
+                    </div>
+                </div>
+
+                <div class="section-title">Compliance Checklist</div>
+                <div class="compliance-checklist">
+                    <div class="checklist-item pending">
+                        <span class="checklist-icon">⏳</span>
+                        Risk Management System
+                    </div>
+                    <div class="checklist-item missing">
+                        <span class="checklist-icon">❌</span>
+                        Technical Documentation
+                    </div>
+                    <div class="checklist-item completed">
+                        <span class="checklist-icon">✅</span>
+                        Data Governance
+                    </div>
+                    <div class="checklist-item missing">
+                        <span class="checklist-icon">❌</span>
+                        Human Oversight
+                    </div>
+                    <div class="checklist-item pending">
+                        <span class="checklist-icon">⏳</span>
+                        CE Marking Process
+                    </div>
+                    <div class="checklist-item missing">
+                        <span class="checklist-icon">❌</span>
+                        EU Database Registration
+                    </div>
+                </div>
+
+                <div class="section-title">AI Models in Use</div>
+                <div class="ai-models">
+                    <div class="model-item">
+                        <div class="model-type">Credit Risk Model</div>
+                        <span class="model-status high-risk">High-Risk</span>
+                        <div style="font-size: 0.8rem; margin-top: 5px;">Requires full compliance</div>
+                    </div>
+                    <div class="model-item">
+                        <div class="model-type">Customer Chatbot</div>
+                        <span class="model-status gpai">GPAI</span>
+                        <div style="font-size: 0.8rem; margin-top: 5px;">Transparency requirements</div>
+                    </div>
+                    <div class="model-item">
+                        <div class="model-type">Fraud Detection</div>
+                        <span class="model-status standard">Standard</span>
+                        <div style="font-size: 0.8rem; margin-top: 5px;">Exception applies</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // AI Act knowledge base
+        const aiActKnowledgeBase = {
+            riskCategories: {
+                'prohibited': {
+                    title: 'Prohibited AI Systems',
+                    description: 'AI systems that pose unacceptable risks and are banned under the AI Act',
+                    examples: [
+                        'Social scoring by governments',
+                        'Manipulative AI targeting vulnerable groups',
+                        'Real-time remote biometric identification in public spaces',
+                        'AI systems exploiting vulnerable groups'
+                    ],
+                    penalty: 'Up to €35 million or 7% of global annual turnover'
+                },
+                'high-risk': {
+                    title: 'High-Risk AI Systems',
+                    description: 'AI systems that significantly impact safety, health, or fundamental rights',
+                    examples: [
+                        'Credit scoring and creditworthiness assessment',
+                        'Life and health insurance risk assessment',
+                        'Emergency response systems',
+                        'Biometric identification systems'
+                    ],
+                    requirements: [
+                        'Risk management system',
+                        'Data governance',
+                        'Technical documentation',
+                        'Record-keeping and logging',
+                        'Transparency and user information',
+                        'Human oversight',
+                        'Accuracy, robustness, and cybersecurity',
+                        'CE marking and registration'
+                    ]
+                },
+                'limited-risk': {
+                    title: 'Limited Risk AI Systems',
+                    description: 'AI systems requiring transparency obligations',
+                    examples: [
+                        'Customer service chatbots',
+                        'AI-generated content',
+                        'Deepfake detection systems'
+                    ],
+                    requirements: [
+                        'Inform users they are interacting with AI',
+                        'Mark AI-generated content as artificial',
+                        'Provide clear disclosure of AI use'
+                    ]
+                },
+                'minimal-risk': {
+                    title: 'Minimal Risk AI Systems',
+                    description: 'AI systems with minimal regulatory requirements',
+                    examples: [
+                        'Spam filters',
+                        'AI-enabled video games',
+                        'Basic recommendation systems'
+                    ],
+                    requirements: [
+                        'General AI literacy obligations',
+                        'Voluntary codes of conduct'
+                    ]
+                }
+            },
+            
+            articles: {
+                'article6': {
+                    title: 'Article 6 - Classification Rules for High-Risk AI Systems',
+                    content: 'Defines which AI systems are considered high-risk based on their use in critical areas or as safety components.',
+                    keyPoints: [
+                        'AI systems listed in Annex III are considered high-risk',
+                        'AI systems used as safety components in regulated products',
+                        'Exception for systems not posing significant risk to health, safety, or rights',
+                        'Provider assessment required for exemption claims'
+                    ]
+                },
+                'article9': {
+                    title: 'Article 9 - Risk Management System',
+                    content: 'Requires implementation of risk management systems throughout the AI system lifecycle.',
+                    keyPoints: [
+                        'Continuous risk assessment process',
+                        'Risk mitigation measures',
+                        'Regular testing and validation',
+                        'Documentation of risk management activities'
+                    ]
+                },
+                'article10': {
+                    title: 'Article 10 - Data and Data Governance',
+                    content: 'Sets requirements for training, validation, and testing datasets.',
+                    keyPoints: [
+                        'Data must be relevant and representative',
+                        'Error-free and complete datasets',
+                        'Bias detection and mitigation',
+                        'Data quality management processes'
+                    ]
+                },
+                'article13': {
+                    title: 'Article 13 - Transparency and Provision of Information',
+                    content: 'Requires clear information provision to deployers and users.',
+                    keyPoints: [
+                        'Instructions for use',
+                        'System capabilities and limitations',
+                        'Expected level of accuracy',
+                        'Information for proper interpretation of outputs'
+                    ]
+                },
+                'article14': {
+                    title: 'Article 14 - Human Oversight',
+                    content: 'Mandates human oversight mechanisms for high-risk AI systems.',
+                    keyPoints: [
+                        'Meaningful human control',
+                        'Ability to intervene and override decisions',
+                        'Understanding of system capabilities',
+                        'Monitoring of system operation'
+                    ]
+                },
+                'article15': {
+                    title: 'Article 15 - Accuracy, Robustness and Cybersecurity',
+                    content: 'Technical requirements for system performance and security.',
+                    keyPoints: [
+                        'Appropriate level of accuracy',
+                        'Robustness against errors and faults',
+                        'Cybersecurity measures',
+                        'Resilience against attacks'
+                    ]
+                }
+            },
+
+            systemTypes: {
+                'credit-scoring': {
+                    risk: 'high-risk',
+                    category: 'Essential Private Services',
+                    requirements: 'Full AI Act compliance required',
+                    exceptions: 'Fraud detection systems are exempt',
+                    cloudConfig: 'Enhanced logging, audit trails, human oversight interfaces'
+                },
+                'fraud-detection': {
+                    risk: 'exempt',
+                    category: 'Financial Fraud Detection',
+                    requirements: 'Exempt from high-risk classification',
+                    exceptions: 'Must still comply with general AI literacy',
+                    cloudConfig: 'Standard security controls, basic monitoring'
+                },
+                'risk-assessment': {
+                    risk: 'high-risk',
+                    category: 'Financial Risk Assessment',
+                    requirements: 'Full compliance if affects individuals',
+                    exceptions: 'Internal risk models may have lighter requirements',
+                    cloudConfig: 'Risk management systems, data governance controls'
+                },
+                'insurance-pricing': {
+                    risk: 'high-risk',
+                    category: 'Life and Health Insurance',
+                    requirements: 'Strict compliance for individual assessment',
+                    exceptions: 'Actuarial models may have different treatment',
+                    cloudConfig: 'Comprehensive documentation, human oversight'
+                },
+                'customer-service': {
+                    risk: 'limited-risk',
+                    category: 'Transparency Requirements',
+                    requirements: 'Must disclose AI interaction',
+                    exceptions: 'Clear if artificial nature is obvious',
+                    cloudConfig: 'User disclosure mechanisms, interaction logging'
+                },
+                'trading-algorithms': {
+                    risk: 'varies',
+                    category: 'Algorithmic Trading',
+                    requirements: 'Depends on individual impact',
+                    exceptions: 'Market-level algorithms typically exempt',
+                    cloudConfig: 'Market surveillance integration, risk controls'
+                }
+            }
+        };
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                addMessage(message, 'user');
+                input.value = '';
+                
+                showTypingIndicator();
+                
+                setTimeout(() => {
+                    hideTypingIndicator();
+                    const response = generateAIActResponse(message);
+                    addMessage(response, 'bot');
+                }, 2000);
+            }
+        }
+
+        function addMessage(text, sender) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = sender === 'user' ? 'U' : '🤖';
+            
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            content.innerHTML = text;
+            
+            if (sender === 'user') {
+                messageDiv.appendChild(content);
+                messageDiv.appendChild(avatar);
+            } else {
+                messageDiv.appendChild(avatar);
+                messageDiv.appendChild(content);
+            }
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function generateAIActResponse(message) {
+            const systemType = document.getElementById('aiSystemType').value;
+            const lowerMessage = message.toLowerCase();
+            
+            // Check for specific queries
+            if (lowerMessage.includes('high-risk') || lowerMessage.includes('high risk')) {
+                return generateHighRiskResponse(systemType);
+            } else if (lowerMessage.includes('gpai') || lowerMessage.includes('general purpose')) {
+                return generateGPAIResponse();
+            } else if (lowerMessage.includes('prohibited') || lowerMessage.includes('banned')) {
+                return generateProhibitedResponse();
+            } else if (lowerMessage.includes('penalties') || lowerMessage.includes('fines')) {
+                return generatePenaltiesResponse();
+            } else if (lowerMessage.includes('timeline') || lowerMessage.includes('implementation')) {
+                return generateTimelineResponse();
+            } else if (lowerMessage.includes('cloud') || lowerMessage.includes('configuration')) {
+                return generateCloudConfigResponse(systemType);
+            } else if (lowerMessage.includes('documentation') || lowerMessage.includes('technical docs')) {
+                return generateDocumentationResponse();
+            } else if (lowerMessage.includes('human oversight') || lowerMessage.includes('human control')) {
+                return generateHumanOversightResponse();
+            } else {
+                return generateSystemSpecificResponse(systemType, message);
+            }
+        }
+
+        function generateHighRiskResponse(systemType) {
+            const system = aiActKnowledgeBase.systemTypes[systemType];
+            const highRisk = aiActKnowledgeBase.riskCategories['high-risk'];
+            
+            return `<strong>High-Risk AI Systems under the EU AI Act:</strong><br><br>
+            <div class="compliance-card">
+                <strong>Your ${getSystemDisplayName(systemType)}:</strong><br>
+                Risk Level: <strong>${system.risk.toUpperCase()}</strong><br>
+                Category: ${system.category}<br><br>
+                ${system.requirements}
+            </div>
+            
+            <div class="ai-requirements">
+                <strong>📋 Compliance Requirements for High-Risk Systems:</strong><br>
+                ${highRisk.requirements.map(req => `• ${req}`).join('<br>')}
+            </div>
+            
+            <strong>⚖️ Key Obligations:</strong><br>
+            • Conformity assessment and CE marking before market placement<br>
+            • Registration in EU database for high-risk AI systems<br>
+            • Post-market monitoring and incident reporting<br>
+            • Quality management system throughout lifecycle<br><br>
+            
+            <strong>Implementation Deadline:</strong> August 2, 2026<br>
+            <strong>Penalties:</strong> Up to €20 million or 4% of global annual turnover`;
+        }
+
+        function generateGPAIResponse() {
+            return `<strong>General Purpose AI Models (GPAI) under the AI Act:</strong><br><br>
+            <div class="compliance-card">
+                <strong>📊 GPAI Classification:</strong><br>
+                • Standard GPAI: All foundation models<br>
+                • Systemic Risk GPAI: ≥10²⁵ FLOPs computational threshold<br>
+                • Open Source: Special provisions apply
+            </div>
+            
+            <div class="ai-requirements">
+                <strong>🔧 Standard GPAI Requirements (All Models):</strong><br>
+                • Technical documentation<br>
+                • Instructions for use<br>
+                • Copyright Directive compliance<br>
+                • Training data summary publication<br><br>
+                
+                <strong>⚠️ Systemic Risk GPAI Additional Requirements:</strong><br>
+                • Model evaluations and adversarial testing<br>
+                • Serious incident tracking and reporting<br>
+                • Cybersecurity protections<br>
+                • Risk assessment and mitigation
+            </div>
+            
+            <strong>Financial Services Impact:</strong><br>
+            • Banks using large language models for customer service<br>
+            • Investment firms using AI for market analysis<br>
+            • Insurance companies using AI for claims processing<br><br>
+            
+            <strong>Implementation:</strong> August 2, 2025`;
+        }
+
+        function generateProhibitedResponse() {
+            const prohibited = aiActKnowledgeBase.riskCategories['prohibited'];
+            
+            return `<strong>Prohibited AI Systems - BANNED under EU AI Act:</strong><br><br>
+            <div class="compliance-card" style="border-left-color: #dc3545; background: #fff5f5;">
+                <strong>🚫 Unacceptable Risk Systems:</strong><br>
+                ${prohibited.examples.map(example => `• ${example}`).join('<br>')}
+            </div>
+            
+            <div class="ai-requirements">
+                <strong>⚖️ Enforcement:</strong><br>
+                • Immediate ban since February 2, 2025<br>
+                • No grace period or exceptions<br>
+                • Maximum penalties: ${prohibited.penalty}
+            </div>
+            
+            <strong>Financial Services Considerations:</strong><br>
+            • No social scoring systems for customer evaluation<br>
+            • No manipulative AI in marketing or sales<br>
+            • Biometric surveillance restrictions in branches<br>
+            • Employee monitoring must respect fundamental rights<br><br>
+            
+            <strong>Compliance Action:</strong> Immediate cessation of any prohibited practices required`;
+        }
+
+        function generatePenaltiesResponse() {
+            return `<strong>EU AI Act Penalties Structure:</strong><br><br>
+            <div class="compliance-card">
+                <strong>💰 Financial Penalties (whichever is higher):</strong><br><br>
+                <strong>Tier 1 - Prohibited AI:</strong><br>
+                • €35 million OR 7% of global annual turnover<br><br>
+                
+                <strong>Tier 2 - High-Risk Violations:</strong><br>
+                • €20 million OR 4% of global annual turnover<br><br>
+                
+                <strong>Tier 3 - Limited Risk/GPAI:</strong><br>
+                • €10 million OR 2% of global annual turnover<br><br>
+                
+                <strong>Tier 4 - Other Violations:</strong><br>
+                • €7.5 million OR 1.5% of global annual turnover
+            </div>
+            
+            <div class="ai-requirements">
+                <strong>⚠️ Additional Enforcement Actions:</strong><br>
+                • Suspension of AI system operation<br>
+                • Mandatory system recalls<br>
+                • Market access restrictions<br>
+                • Reputational damage and regulatory scrutiny
+            </div>
+            
+            <strong>For Financial Institutions:</strong><br>
+            These penalties are in addition to existing financial services sanctions. Multiple regulatory frameworks may apply simultaneously.`;
+        }
+
+        function generateTimelineResponse() {
+            return `<strong>EU AI Act Implementation Timeline:</strong><br><br>
+            <div class="compliance-card">
+                <strong>📅 Key Milestones:</strong><br><br>
+                
+                <strong>✅ August 1, 2024:</strong> AI Act entered into force<br><br>
+                
+                <strong>🚫 February 2, 2025:</strong> (ACTIVE)<br>
+                • Prohibited AI systems ban<br>
+                • AI literacy obligations<br><br>
+                
+                <strong>⏰ August 2, 2025:</strong> (UPCOMING)<br>
+                • GPAI model requirements<br>
+                • Governance and oversight rules<br>
+                • Penalty framework activation<br><br>
+                
+                <strong>🎯 August 2, 2026:</strong> (TARGET)<br>
+                • High-risk AI system requirements<br>
+                • Full compliance obligations<br>
+                • Market surveillance activation<br><br>
+                
+                <strong>🔧 August 2, 2027:</strong> (EXTENDED)<br>
+                • Embedded high-risk systems<br>
+                • Legacy system compliance
+            </div>
+            
+            <strong>Preparation Recommendations:</strong><br>
+            • Conduct AI system inventory now<br>
+            • Begin risk classification process<br>
+            • Start documentation requirements<br>
+            • Implement governance frameworks`;
+        }
+
+        function generateCloudConfigResponse(systemType) {
+            const system = aiActKnowledgeBase.systemTypes[systemType];
+            
+            return `<strong>Cloud Configuration for AI Act Compliance:</strong><br><br>
+            <div class="compliance-card">
+                <strong>🏗️ ${getSystemDisplayName(systemType)} Cloud Requirements:</strong><br>
+                ${system.cloudConfig}
+            </div>
+            
+            <div class="ai-requirements">
+                <strong>🔧 Technical Implementation:</strong><br><br>
+                
+                <strong>AWS Configuration:</strong><br>
+                • SageMaker Model Registry for AI system tracking<br>
+                • CloudTrail for comprehensive audit logging<br>
+                • Config Rules for compliance monitoring<br>
+                • IAM roles for human oversight access<br><br>
+                
+                <strong>Azure Configuration:</strong><br>
+                • ML Studio for model lifecycle management<br>
+                • Monitor for AI system performance tracking<br>
+                • Policy for governance enforcement<br>
+                • RBAC for human oversight controls<br><br>
+                
+                <strong>Google Cloud Configuration:</strong><br>
+                • AI Platform for model management<br>
+                • Cloud Logging for audit trails<br>
+                • Asset Inventory for system tracking<br>
+                • IAM for access control and oversight
+            </div>
+            
+            <strong>Compliance Features Required:</strong><br>
+            • Automated logging of AI decisions<br>
+            • Human override mechanisms<br>
+            • Performance monitoring dashboards<br>
+            • Incident reporting systems<br>
+            • Data lineage tracking`;
+        }
+
+        function generateDocumentationResponse() {
+            return `<strong>Technical Documentation Requirements:</strong><br><br>
+            <div class="compliance-card">
+                <strong>📋 Mandatory Documentation for High-Risk AI:</strong><br><br>
+                
+                <strong>System Description:</strong><br>
+                • Intended purpose and use cases<br>
+                • Hardware and software interactions<br>
+                • Instructions for deployers<br><br>
+                
+                <strong>Development Process:</strong><br>
+                • Design and development methodology<br>
+                • Testing and validation procedures<br>
+                • Cybersecurity measures implemented<br><br>
+                
+                <strong>Data Documentation:</strong><br>
+                • Training dataset characteristics<br>
+                • Data provenance and scope<br>
+                • Data collection procedures<br>
+                • Bias assessment and mitigation
+            </div>
+            
+            <div class="ai-requirements">
+                <strong>🔄 Lifecycle Documentation:</strong><br>
+                • Risk management documentation<br>
+                • Quality management system records<br>
+                • Post-market monitoring reports<br>
+                • Incident and malfunction logs<br>
+                • Corrective action documentation
+            </div>
+            
+            <strong>Cloud Implementation:</strong><br>
+            Documentation must be maintained in secure, auditable cloud storage with version control and access logging.`;
+        }
+
+        function generateHumanOversightResponse() {
+            return `<strong>Human Oversight Requirements (Article 14):</strong><br><br>
+            <div class="compliance-card">
+                <strong>👥 Meaningful Human Control Principles:</strong><br><br>
+                
+                <strong>Understanding:</strong><br>
+                • Humans must understand AI system capabilities and limitations<br>
+                • Clear knowledge of when human intervention is needed<br>
+                • Awareness of automation bias risks<br><br>
+                
+                <strong>Intervention:</strong><br>
+                • Ability to override or disregard AI outputs<br>
+                • Power to interrupt system operation<br>
+                • Authority to make final decisions in critical situations
+            </div>
+            
+            <div class="ai-requirements">
+                <strong>⚙️ Technical Implementation:</strong><br>
+                • Human-machine interface design<br>
+                • Override mechanisms and controls<br>
+                • Alert systems for human attention<br>
+                • Decision audit trails<br>
+                • Training programs for human operators
+            </div>
+            
+            <strong>Financial Services Examples:</strong><br>
+            • Credit decisions: Human review of AI recommendations<br>
+            • Fraud detection: Human validation of suspicious activities<br>
+            • Insurance claims: Human oversight of automated assessments<br>
+            • Investment advice: Human advisor review of AI-generated recommendations<br><br>
+            
+            <strong>Cloud Architecture:</strong> Design systems with clear human intervention points and escalation pathways.`;
+        }
+
+        function generateSystemSpecificResponse(systemType, message) {
+            const system = aiActKnowledgeBase.systemTypes[systemType];
+            
+            return `<strong>AI Act Compliance for ${getSystemDisplayName(systemType)}:</strong><br><br>
+            <div class="compliance-card">
+                <strong>📊 System Assessment:</strong><br>
+                Risk Classification: <strong>${system.risk.toUpperCase()}</strong><br>
+                Regulatory Category: ${system.category}<br>
+                Compliance Requirements: ${system.requirements}
+            </div>
+            
+            <div class="ai-requirements">
+                <strong>🎯 Specific Obligations:</strong><br>
+                ${system.exceptions}<br><br>
+                
+                <strong>Implementation Guidance:</strong><br>
+                ${system.cloudConfig}
+            </div>
+            
+            <strong>Next Steps:</strong><br>
+            1. Conduct detailed risk assessment<br>
+            2. Review current system architecture<br>
+            3. Implement required technical measures<br>
+            4. Prepare documentation and governance<br>
+            5. Plan for certification and registration<br><br>
+            
+            Would you like specific guidance on any of these implementation steps?`;
+        }
+
+        function selectRiskCategory(category) {
+            const categoryData = aiActKnowledgeBase.riskCategories[category];
+            addMessage(`Tell me about ${categoryData.title}`, 'user');
+            
+            setTimeout(() => {
+                let response = `<strong>${categoryData.title}:</strong><br><br>
+                <div class="compliance-card">
+                    ${categoryData.description}<br><br>
+                    <strong>Examples:</strong><br>
+                    ${categoryData.examples.map(ex => `• ${ex}`).join('<br>')}
+                </div>`;
+                
+                if (categoryData.requirements) {
+                    response += `<div class="ai-requirements">
+                        <strong>Requirements:</strong><br>
+                        ${categoryData.requirements.map(req => `• ${req}`).join('<br>')}
+                    </div>`;
+                }
+                
+                if (categoryData.penalty) {
+                    response += `<br><strong>Penalties:</strong> ${categoryData.penalty}`;
+                }
+                
+                addMessage(response, 'bot');
+            }, 1500);
+        }
+
+        function selectArticle(articleId) {
+            const article = aiActKnowledgeBase.articles[articleId];
+            addMessage(`Explain ${article.title}`, 'user');
+            
+            setTimeout(() => {
+                const response = `<strong>${article.title}:</strong><br><br>
+                <div class="compliance-card">
+                    ${article.content}
+                </div>
+                
+                <div class="ai-requirements">
+                    <strong>Key Requirements:</strong><br>
+                    ${article.keyPoints.map(point => `• ${point}`).join('<br>')}
+                </div>
+                
+                <strong>Implementation Impact:</strong><br>
+                This article directly affects how you design, deploy, and monitor AI systems in cloud environments. 
+                Proper implementation requires both technical controls and organizational processes.`;
+                
+                addMessage(response, 'bot');
+            }, 1500);
+        }
+
+        function getSystemDisplayName(systemType) {
+            const displayNames = {
+                'credit-scoring': 'Credit Scoring System',
+                'fraud-detection': 'Fraud Detection System',
+                'risk-assessment': 'Risk Assessment System',
+                'insurance-pricing': 'Insurance Pricing System',
+                'customer-service': 'Customer Service AI',
+                'trading-algorithms': 'Trading Algorithms',
+                'compliance-monitoring': 'Compliance Monitoring System',
+                'chatbot': 'Customer Chatbot'
+            };
+            return displayNames[systemType] || 'AI System';
+        }
+
+        function showTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'block';
+        }
+
+        function hideTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'none';
+        }
+
+        function updateComplianceStatus() {
+            const systemType = document.getElementById('aiSystemType').value;
+            const system = aiActKnowledgeBase.systemTypes[systemType];
+            const statusIndicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+            const riskLevel = document.getElementById('riskLevel');
+            
+            // Update status based on system type
+            if (system.risk === 'high-risk') {
+                statusIndicator.className = 'status-indicator non-compliant';
+                statusText.textContent = 'High-Risk: Full Compliance Required';
+                riskLevel.innerHTML = 'HIGH<br>RISK';
+            } else if (system.risk === 'limited-risk') {
+                statusIndicator.className = 'status-indicator';
+                statusText.textContent = 'Limited Risk: Transparency Required';
+                riskLevel.innerHTML = 'LIMITED<br>RISK';
+            } else if (system.risk === 'exempt') {
+                statusIndicator.className = 'status-indicator compliant';
+                statusText.textContent = 'Exempt: Standard Requirements Only';
+                riskLevel.innerHTML = 'EXEMPT<br>STATUS';
+            } else {
+                statusIndicator.className = 'status-indicator';
+                statusText.textContent = 'Assessment Required';
+                riskLevel.innerHTML = 'VARIES<br>BY USE';
+            }
+        }
+
+        // Event listeners
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        document.getElementById('aiSystemType').addEventListener('change', updateComplianceStatus);
+
+        // Initialize
+        updateComplianceStatus();
+
+        // Welcome message continuation
+        setTimeout(() => {
+            const welcomeMessage = `<strong>🚀 System Status Update:</strong><br><br>
+            <div class="compliance-card">
+                <strong>Current AI Act Phase:</strong> Early Implementation<br>
+                • Prohibited AI systems are now banned<br>
+                • GPAI requirements coming August 2025<br>
+                • High-risk systems deadline: August 2026<br>
+                • Financial institutions should begin preparation immediately
+            </div>
+            
+            <strong>Quick Assessment Questions:</strong><br>
+            • What type of AI system are you implementing?<br>
+            • Does it make decisions affecting individuals?<br>
+            • Is it used for credit scoring or risk assessment?<br>
+            • Do you use large language models or GPAI?<br><br>
+            
+            Select your AI system type above and ask me specific questions about compliance requirements!`;
+            
+            addMessage(welcomeMessage, 'bot');
+        }, 3000);
+    </script>
+</body>
+</html>
