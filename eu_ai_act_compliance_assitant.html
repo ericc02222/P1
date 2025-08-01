@@ -511,6 +511,11 @@
         }
 
         /* Mobile Responsiveness */
+        @media (min-width: 801px) {
+            .content-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
         @media (max-width: 768px) {
             .framework-components {
                 grid-template-columns: 1fr;
@@ -1015,75 +1020,6 @@
                 </div>
             </div>
 
-            <!-- Enhanced Business Case Generator -->
-            <div class="content-card">
-                <div class="card-header">
-                    <div class="card-icon business">💼</div>
-                    <div>
-                        <div class="card-title">Business Case Generator</div>
-                        <div class="card-description" id="businessDescription">Research-validated financial modeling with multi-institutional scenarios</div>
-                        <p class="demo-note">
-                            Smart Document Analysis Demonstration Analysis: Document upload interface with randomized scoring for demonstration purposes. Note: Analysis results are simulated and not based on actual document content.
-                        </p>
-                    </div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 15px 0;">
-                    <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #4caf50;">
-                        <div style="font-size: 1.5rem; font-weight: bold; color: #2e7d32;" id="dynamicInvestment">€2.17M</div>
-                        <div style="font-size: 0.8rem; color: #666;">Implementation Cost</div>
-                    </div>
-                    <div style="background: #fff3e0; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #ff9800;">
-                        <div style="font-size: 1.5rem; font-weight: bold; color: #ef6c00;" id="dynamicPenalty">€168M</div>
-                        <div style="font-size: 0.8rem; color: #666;">Penalty Protection</div>
-                    </div>
-                    <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #2196f3;">
-                        <div style="font-size: 1.5rem; font-weight: bold; color: #1976d2;" id="dynamicRatio">16.1x</div>
-                        <div style="font-size: 0.8rem; color: #666;">Protection Ratio</div>
-                    </div>
-                    <div style="background: #f3e5f5; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #9c27b0;">
-                        <div style="font-size: 1.5rem; font-weight: bold; color: #7b1fa2;" id="dynamicNPV">€8.4M</div>
-                        <div style="font-size: 0.8rem; color: #666;">NPV (3 Years)</div>
-                    </div>
-                </div>
-
-                <div style="background: #f8f9fa; border-radius: 10px; padding: 20px; margin: 15px 0;">
-                    <h4 style="color: #1e3c72; margin-bottom: 15px;">💰 Investment Breakdown (<span id="institutionName">AIB</span>)</h4>
-                    <div style="display: grid; gap: 8px;" id="investmentBreakdown">
-                        <div style="display: flex; justify-content: space-between; padding: 8px; background: white; border-radius: 6px;">
-                            <span>Personnel Costs (15 FTE, 24 months):</span>
-                            <span style="font-weight: bold;">€1.30M</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; padding: 8px; background: white; border-radius: 6px;">
-                            <span>Technology & Integration:</span>
-                            <span style="font-weight: bold;">€540K</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; padding: 8px; background: white; border-radius: 6px;">
-                            <span>External Consulting & Legal:</span>
-                            <span style="font-weight: bold;">€217K</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; padding: 8px; background: white; border-radius: 6px;">
-                            <span>Training & Change Management:</span>
-                            <span style="font-weight: bold;">€108K</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; padding: 12px; background: #e3f2fd; border-radius: 6px; border: 1px solid #2196f3; margin-top: 8px;">
-                            <span style="font-weight: bold;">Total Implementation Cost:</span>
-                            <span style="font-weight: bold; color: #1976d2;">€2.17M</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="margin-top: 15px;">
-                    <button class="btn" onclick="generateBusinessCase()">📊 Generate Detailed Business Case</button>
-                    <button class="btn-secondary" onclick="showROIComparison()">🔍 Multi-Institution Comparison</button>
-                    <button class="btn-secondary" onclick="showSensitivityAnalysis()">📈 Sensitivity Analysis</button>
-                </div>
-
-                <div id="businessCaseResults" style="background: #f8f9fa; border-radius: 10px; padding: 20px; margin: 15px 0; display: none;">
-                    <div id="businessCaseContent"></div>
-                </div>
-            </div>
-
             <!-- Enhanced Smart Document Analysis -->
             <div class="content-card">
                 <div class="card-header">
@@ -1143,6 +1079,74 @@
 
                 <div id="documentResults" style="background: #f8f9fa; border-radius: 10px; padding: 20px; margin: 15px 0; display: none;">
                     <div id="documentResultsContent"></div>
+                </div>
+                
+            <!-- Enhanced Business Case Generator -->
+            <div class="content-card">
+                <div class="card-header">
+                    <div class="card-icon business">💼</div>
+                    <div>
+                        <div class="card-title">Business Case Generator</div>
+                        <div class="card-description" id="businessDescription">Research-validated financial modeling with multi-institutional scenarios</div>
+                        <p class="demo-note">
+                            Three detailed institutional scenarios (AIB, Santander, ING) with validated business case modeling and ROI protection analysis.
+                        </p>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 15px 0;">
+                    <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #4caf50;">
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #2e7d32;" id="dynamicInvestment">€2.17M</div>
+                        <div style="font-size: 0.8rem; color: #666;">Implementation Cost</div>
+                    </div>
+                    <div style="background: #fff3e0; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #ff9800;">
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #ef6c00;" id="dynamicPenalty">€168M</div>
+                        <div style="font-size: 0.8rem; color: #666;">Penalty Protection</div>
+                    </div>
+                    <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #2196f3;">
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #1976d2;" id="dynamicRatio">16.1x</div>
+                        <div style="font-size: 0.8rem; color: #666;">Protection Ratio</div>
+                    </div>
+                    <div style="background: #f3e5f5; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #9c27b0;">
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #7b1fa2;" id="dynamicNPV">€8.4M</div>
+                        <div style="font-size: 0.8rem; color: #666;">NPV (3 Years)</div>
+                    </div>
+                </div>
+
+                <div style="background: #f8f9fa; border-radius: 10px; padding: 20px; margin: 15px 0;">
+                    <h4 style="color: #1e3c72; margin-bottom: 15px;">💰 Investment Breakdown (<span id="institutionName">AIB</span>)</h4>
+                    <div style="display: grid; gap: 8px;" id="investmentBreakdown">
+                        <div style="display: flex; justify-content: space-between; padding: 8px; background: white; border-radius: 6px;">
+                            <span>Personnel Costs (15 FTE, 24 months):</span>
+                            <span style="font-weight: bold;">€1.30M</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 8px; background: white; border-radius: 6px;">
+                            <span>Technology & Integration:</span>
+                            <span style="font-weight: bold;">€540K</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 8px; background: white; border-radius: 6px;">
+                            <span>External Consulting & Legal:</span>
+                            <span style="font-weight: bold;">€217K</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 8px; background: white; border-radius: 6px;">
+                            <span>Training & Change Management:</span>
+                            <span style="font-weight: bold;">€108K</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 12px; background: #e3f2fd; border-radius: 6px; border: 1px solid #2196f3; margin-top: 8px;">
+                            <span style="font-weight: bold;">Total Implementation Cost:</span>
+                            <span style="font-weight: bold; color: #1976d2;">€2.17M</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <button class="btn" onclick="generateBusinessCase()">📊 Generate Detailed Business Case</button>
+                    <button class="btn-secondary" onclick="showROIComparison()">🔍 Multi-Institution Comparison</button>
+                    <button class="btn-secondary" onclick="showSensitivityAnalysis()">📈 Sensitivity Analysis</button>
+                </div>
+
+                <div id="businessCaseResults" style="background: #f8f9fa; border-radius: 10px; padding: 20px; margin: 15px 0; display: none;">
+                    <div id="businessCaseContent"></div>
                 </div>
             </div>
         </div>
